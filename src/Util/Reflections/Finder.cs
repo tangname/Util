@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Util.Reflections {
     /// <summary>
@@ -56,7 +57,9 @@ namespace Util.Reflections {
         /// <summary>
         /// 程序集是否匹配
         /// </summary>
-        private bool Match( AssemblyName assemblyName ) {
+        protected virtual bool Match( AssemblyName assemblyName ) {
+            if ( assemblyName.FullName.StartsWith( $"{PlatformServices.Default.Application.ApplicationName}.Views" ) )
+                return false;
             return !Regex.IsMatch( assemblyName.FullName, SkipAssemblies, RegexOptions.IgnoreCase | RegexOptions.Compiled );
         }
 

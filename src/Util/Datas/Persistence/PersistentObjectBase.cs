@@ -1,11 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Util.Domains;
 
 namespace Util.Datas.Persistence {
     /// <summary>
     /// 持久化对象
     /// </summary>
+    public abstract class PersistentObjectBase : PersistentObjectBase<Guid> {
+    }
+
+    /// <summary>
+    /// 持久化对象
+    /// </summary>
     /// <typeparam name="TKey">标识类型</typeparam>
-    public abstract class PersistentObjectBase<TKey> : IPersistentObject<TKey> {
+    public abstract class PersistentObjectBase<TKey> : IKey<TKey>, IVersion {
         /// <summary>
         /// 标识
         /// </summary>
@@ -34,7 +42,7 @@ namespace Util.Datas.Persistence {
                 return true;
             if( (object)left == null || (object)right == null )
                 return false;
-            if ( left.GetType() != right.GetType() )
+            if( left.GetType() != right.GetType() )
                 return false;
             if( Equals( left.Id, null ) )
                 return false;
@@ -51,7 +59,7 @@ namespace Util.Datas.Persistence {
         }
 
         /// <summary>
-        /// 版本号(乐观锁)
+        /// 版本号
         /// </summary>
         public byte[] Version { get; set; }
     }

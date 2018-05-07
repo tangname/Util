@@ -4,6 +4,7 @@
 //================================================
 import { UUID } from './internal/uuid';
 import * as moment from 'moment';
+import * as _ from "lodash";
 
 /**
  * 是否未定义
@@ -22,15 +23,11 @@ export let isString = (value): boolean => {
 }
 
 /**
- * 是否空值，当值为undefined、null、空字符串、空Guid时返回true，其余返回false
+ * 是否空值，当值为undefined、null、空对象,空字符串、空Guid时返回true，其余返回false
  * @param value 值
  */
 export let isEmpty = (value): boolean => {
-    if (isUndefined(value))
-        return true;
-    if (value === null)
-        return true;
-    if (!isString(value))
+    if ( typeof value === "number")
         return false;
     if (value && value.trim)
         value = value.trim();
@@ -38,7 +35,7 @@ export let isEmpty = (value): boolean => {
         return true;
     if (value === "00000000-0000-0000-0000-000000000000")
         return true;
-    return false;
+    return _.isEmpty(value);
 }
 
 /**
@@ -83,11 +80,43 @@ export let isEmptyArray = (value): boolean => {
 }
 
 /**
+ * 获取数组中第一个
+ * @param array 数组
+ */
+export let first = <T>(array): T => {
+    return _.first<T>(array);
+}
+
+/**
+ * 获取数组中最后一个
+ * @param array 数组
+ */
+export let last = <T>(array): T => {
+    return _.last<T>(array);
+}
+
+/**
  * 转换为json字符串
  * @param value 值
  */
 export let toJson = (value): string => {
     return JSON.stringify(value);
+}
+
+/**
+ * json字符串转换为对象
+ * @param json json字符串
+ */
+export let toObjectFromJson = <T>(json: string): T => {
+    return JSON.parse(json);
+}
+
+/**
+ * 复制对象
+ * @param obj 对象
+ */
+export let clone = <T>(obj: T): T => {
+    return JSON.parse(JSON.stringify(obj));
 }
 
 /**
@@ -169,4 +198,67 @@ export let formatDate = (datetime, format: string): string => {
     if (!date.isValid())
         return "";
     return date.format(format);
+}
+
+/**
+ * 通用泛型转换
+ * @param value 值
+ */
+export let to = <T>(value): T => {
+    return <T>value;
+}
+
+/**
+ * 从数组中移除子集
+ * @param source 源数组
+ * @param predicate 条件
+ */
+export let remove = <T>(source: Array<T>, predicate: (value: T) => boolean): Array<T> => {
+    return _.remove(source, t => predicate(t));
+}
+
+/**
+ * 添加项到数组
+ * @param source 源数组
+ * @param items 项
+ */
+export let addToArray = <T>(source: Array<T>, items): Array<T> => {
+    if (isEmpty(items))
+        return source;
+    if (!items.length) {
+        source.push(items);
+        return source;
+    }
+    items.forEach(item => {
+        if (isEmpty(item))
+            return;
+        source.push(item);
+    });
+    return source;
+}
+
+/**
+ * 清空数组
+ * @param array 数组
+ */
+export let clear = (array): void => {
+    if (array && array.length)
+        array.length = 0;
+}
+
+/**
+ * 泛型集合转换
+ * @param input 以逗号分隔的元素集合字符串，范例: 1,2
+ */
+export let toList = <T>(input: string): T[] => {
+    var result = new Array<T>();
+    if (!input)
+        return result;
+    var array = input.split(',');
+    array.forEach(value => {
+        if (!value)
+            return;
+        result.push(to<T>(value));
+    });
+    return result;
 }
